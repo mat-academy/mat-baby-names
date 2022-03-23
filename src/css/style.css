@@ -1,0 +1,62 @@
+html {
+  margin: 0;
+  font-family: "helvetica", sans-serif;
+  background-color: rgb(255, 243, 240);
+  color: rgb(132, 37, 0);
+}
+
+main {
+  margin: 0;
+}
+
+h1 {
+  color: rgb(132, 37, 0);
+  border: 5px solid rgb(132, 37, 0);
+  border-radius: 5px;
+  width: 40%;
+  margin: auto;
+  padding: 20px;
+}
+h2 {
+
+  /* border: 2px solid rgb(144, 97, 125); */
+  padding: 10px
+}
+
+hr {
+  border: 2.5px solid rgb(212, 212, 212);
+  margin: 10px;
+} 
+
+.App {
+  margin: 0;
+  text-align: center;
+}
+  
+.babyName {
+    border: 2px solid black;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 10px;
+}
+  
+.m {
+    border-color: rgb(163, 172, 253);
+    background: rgb(240, 248, 255);
+    color: rgb(35, 47, 184);
+  }
+
+.f {
+    border-color: rgb(170, 255, 219);
+    background: rgb(240, 255, 245);
+    color: rgb(2, 153, 108);
+  }
+  
+.babyNamesList {
+    padding: 5px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  

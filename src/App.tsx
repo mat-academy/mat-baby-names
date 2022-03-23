@@ -1,104 +1,96 @@
-import babydata from "./babynamesdata.json";
-import { useState } from "react";
-import sort from "./utils/sort";
+import React, { useState } from 'react';
+import allBabyNames from './data/babynamesdata.json';
+import './css/style.css';
 
-const males = babydata
-  .filter((x) => x.sex === "m")
-  .sort((a, b) => sort(a.name, b.name));
-const females = babydata
-  .filter((x) => x.sex === "f")
-  .sort((a, b) => sort(a.name, b.name));
-const babies = babydata.sort((a, b) => sort(a.name, b.name));
-
-interface Properties {
-  id: number;
+interface BabyNameInfo {
   name: string;
+  id: number;
   sex: string;
 }
 
+function compareTwoBabyNameInfos(infoA:BabyNameInfo , infoB:BabyNameInfo ) {
+  if(infoA.name < infoB.name){
+    return -1;
+  } else if(infoA.name > infoB.name){
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
 function App(): JSX.Element {
-  const [Names, setNames] = useState<Properties[]>(babies);
-  const [Fav, setFav] = useState<Properties[]>([]);
-  const [filterStorage, setfilterStorage] = useState<Properties[]>(babies);
-  const [activeButton, setactiveButton] = useState("");
+  const sortedBabyNames:BabyNameInfo[] = [...allBabyNames];
+    sortedBabyNames.sort(compareTwoBabyNameInfos);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const maleClick = () => {
-    setNames(males);
-    setfilterStorage(males);
-    setactiveButton("malebutton");
-  };
-  const femaleClick = () => {
-    setNames(females);
-    setfilterStorage(females);
-    setactiveButton("femalebutton");
-  };
-  const anyClick = () => {
-    setNames(babies);
-    setfilterStorage(babies);
-    setactiveButton("anybutton");
-  };
+  const [favouriteNames, setFavouriteNames] = useState<BabyNameInfo[]>([]);
+  const namesToShow: BabyNameInfo[] = sortedBabyNames.filter(doesSearchTermOccurInName);
 
-  // const addToFav = () => setFav()
+  function handleSearchTermUpdated(event: any) {
+      setSearchTerm(event.target.value);
+  }  
+
+  function doesSearchTermOccurInName(nameInfo: BabyNameInfo): boolean {
+    return nameInfo.name.toLowerCase().includes(searchTerm.toLowerCase());
+  }
+
+  function isInFavouriteNamesList(target: BabyNameInfo) {
+    return favouriteNames.find(el => el.id === target.id) !== undefined;
+  }
+
+  function handleNameClick(nameInfo: BabyNameInfo) {
+    if (isInFavouriteNamesList(nameInfo)) {
+      console.log("Name is already in list", nameInfo.name)
+    } else {
+      const newFavouriteNames = [...favouriteNames, nameInfo];
+      setFavouriteNames(newFavouriteNames);
+    }
+  }
+
+  function handleClickOfNameInFavourites(nameInfoToRemove: BabyNameInfo) {
+    const newList = favouriteNames.filter(el => el.id !== nameInfoToRemove.id);
+    setFavouriteNames(newList);
+  }
+
   return (
-    <>
-      <input
-        onChange={(e) =>
-          setNames(
-            filterStorage.filter(
-              (x) =>
-                x.name.toLowerCase().indexOf(e.target.value.toLowerCase()) === 0
-            )
-          )
-        }
+    <div className="App">
+      <h1>Mat's Baby Names</h1>
+      <hr />
+      <input 
+        placeholder = "Looking for a name?"
+        value = {searchTerm}
+        onChange = {handleSearchTermUpdated}
       />
+      <br />
+      currently searching for {searchTerm}
+      <hr />
+      <h2>Favorite names</h2>
 
-      <button
-        onClick={maleClick}
-        className={activeButton === "malebutton" ? "activeButton" : ""}
-      >
-        M
-      </button>
-      <button
-        onClick={femaleClick}
-        className={activeButton === "femalebutton" ? "activeButton" : ""}
-      >
-        F
-      </button>
-      <button
-        onClick={anyClick}
-        className={activeButton === "anybutton" ? "activeButton" : ""}
-      >
-        ‍N
-      </button>
-      <h1>BABY NAMES DATABASE</h1>
-      <hr />
-      <h2>Your Favorite Baby Names</h2>
-      {Fav.map((x) => (
-        <li
-          key={x.id}
-          className={x.sex}
-          onClick={() => {
-            setFav(Fav.filter((y) => y !== x));
-          }}
-        >
-          {x.name}
-        </li>
-      ))}
-      <hr />
-      <main className="Main">
-        {Names.filter((x) => !Fav.includes(x)).map((x, id) => (
-          <li
-            key={x.id}
-            className={x.sex}
-            onClick={() => {
-              setFav([...Fav, x]);
-            }}
-          >
-            {x.name}
-          </li>
+      ({favouriteNames.length}) so far: {favouriteNames.map(el => el.name).join(", ")}
+
+      <div className="babyNamesList">
+        {favouriteNames.map(nameInfo => (
+          <div
+            className={"babyName " + nameInfo.sex}
+            key={nameInfo.id}
+            onClick={() => handleClickOfNameInFavourites(nameInfo)}
+          >{nameInfo.name}</div>
         ))}
-      </main>
-    </>
+      </div>
+      <hr />
+      ({namesToShow.length}) names left in the list:
+      <div className="babyNamesList">
+        {sortedBabyNames.map(nameInfo => (
+          <main
+            className={"babyName " + nameInfo.sex}
+            key={nameInfo.id}
+            onClick={() => handleNameClick(nameInfo)}
+          >{nameInfo.name}</main>
+        )
+        )}
+      </div>
+      <hr />
+    </div>
   );
 }
 
